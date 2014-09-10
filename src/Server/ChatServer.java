@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import shared.Command;
+import shared.CommandHandler;
 import utils.Utils;
 
 /**
@@ -28,6 +30,7 @@ public class ChatServer {
   private static ServerSocket serverSocket;
   private static final Properties properties = Utils.initProperties("server.properties");
   private static List<ClientHandler> clients;
+  private static CommandHandler cmd = new CommandHandler();
 
   public static void stopServer() {
     keepRunning = false;
@@ -37,13 +40,18 @@ public class ChatServer {
       clients.remove(client);
   }
   
-  public static void send(String msg){
-      for (ClientHandler c : clients){
-          c.send(msg);
+  public static void send(Command cmd, String sender){
+      List recipients = cmd.getSendRecipients().get();
+      String message = cmd.getSendMessage().get();
+      
+      for (ClientHandler client : clients){
+          if (recipients.contains(client.getClientId()) || recipients.contains("*")){
+              client.sendCommand("MESSAGE#"+sender+"#"+message);
+          }
       }
-//      clients.stream()
-//      .forEach(c -> c.send(msg));
+      
   }
+
 
   public static void main(String[] args) {
     clients = new ArrayList();
@@ -68,6 +76,27 @@ public class ChatServer {
       finally {
       Utils.closeLogger(ChatServer.class.getName());
     }
+  }
+
+   public static void Connect(String clientID, ClientHandler client) {
+
+       updateOnline();
+       
+    }
+  
+  public static void Close(ClientHandler client){
+      removeHandler(client);
+      updateOnline();
+  }
+  
+  private static void updateOnline(){
+      String persons = "";
+      for (ClientHandler c : clients){
+          persons += c.getClientId() + ",";
+      }
+      String command = "ONLINE#" + persons.substring(0,persons.length()-1);
+      
+      clients.stream().forEach(c -> c.sendCommand(command));
   }
     
 }

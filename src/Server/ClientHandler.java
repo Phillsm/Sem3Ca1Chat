@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import shared.Command;
+import shared.CommandHandler;
 import shared.ProtocolStrings;
 
 /**
@@ -23,21 +25,25 @@ public class ClientHandler extends Thread {
     private final Socket socket;
     private final Scanner input;
     private final PrintWriter writer;
+    private String clientID;
+    private final CommandHandler cmd;
     
    public ClientHandler(Socket socket) throws IOException {
     this.socket = socket;
     this.input = new Scanner(socket.getInputStream());
     this.writer = new PrintWriter(socket.getOutputStream(), true);
+    this.cmd = new CommandHandler();
 
   }
   
    @Override
   public void run(){
     try{
-    String message = input.nextLine(); //IMPORTANT blocking call
+    String message = input.nextLine();//IMPORTANT blocking call
+
     Logger.getLogger(ClientHandler.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ",message));
     while (!message.equals(ProtocolStrings.STOP)) {
-      ChatServer.send(message);
+      parseinput(message);
       Logger.getLogger(ClientHandler.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ",message));
       message = input.nextLine(); //IMPORTANT blocking call
     }
@@ -48,7 +54,40 @@ public class ClientHandler extends Thread {
     }
     catch(Exception e){}
   }
-  public void send(String msg){
+  
+  private void parseinput(String data){
+     Command command = cmd.Parse(data);
+     switch (command.getCmdType()){
+         case Close:
+             Close();
+             break;
+         case Send:
+             Send(command);
+             break;
+         case Connect:
+             Connect(command);
+             break;
+     }
+  }
+  private void Connect(Command cmd){
+       this.clientID =  cmd.getConnectName().get();
+       ChatServer.Connect(cmd.getConnectName().get(), this);
+  }
+   
+  private void Send(Command cmd){
+      ChatServer.send(cmd, this.clientID);
+  }
+  public void sendCommand(String msg){
       writer.println(msg);
   }
+
+    private void Close() {
+       ChatServer.Close(this);//To change body of generated methods, choose Tools | Templates.
+    }
+    
+  public String getClientId(){
+      return this.clientID;
+  }
+
+
 }

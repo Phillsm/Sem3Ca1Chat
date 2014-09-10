@@ -4,16 +4,14 @@
  * and open the template in the editor.
  */
 
-package Client;
-
-import java.util.List;
+package shared;
 
 /**
  *
  * @author Phill
  */
-public interface ChatListener {
-    void MessageCmdArrived(String sender, String msg);
-    void OnlineCmdArrived(List chatters);
-    void CloseCmdArrived();
+public class CommandHandler {
+    public Command Parse(String data){
+        return new Command(data);
+    }
 }
