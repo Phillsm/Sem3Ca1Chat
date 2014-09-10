@@ -60,9 +60,9 @@ public class ChatClient extends Thread{
     this.start();
   }
   
-  public void send(String msg)
+  public void send(String recipients, String msg)
   {
-    output.println("SEND#"+"*#"+msg);
+    output.println("SEND#"+recipients+"#"+msg);
   }
   
 //  public void stap() throws IOException{

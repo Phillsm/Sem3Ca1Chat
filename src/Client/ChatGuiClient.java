@@ -9,6 +9,7 @@ package Client;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 
 /**
@@ -20,10 +21,13 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
     /**
      * Creates new form ChatGuiClient
      */
+    final DefaultListModel model;
     ChatClient client;
     public ChatGuiClient() {
         client = new ChatClient();
         initComponents();
+        model = new DefaultListModel();
+        jList1.setModel(model);
         client.registerEchoListener(this);
         
         this.addWindowListener(new WindowAdapter(){
@@ -50,8 +54,8 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
         jButton1 = new javax.swing.JButton();
         jTextField2 = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,9 +91,12 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
             }
         });
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane3.setViewportView(jList1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -102,14 +109,14 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jTextField1)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton2)
                         .addGap(18, 18, 18)
-                        .addComponent(jScrollPane2))))
+                        .addComponent(jScrollPane3)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,11 +126,9 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                            .addComponent(jButton2)))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -138,7 +143,18 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        client.send(jTextField1.getText());
+        int[] highlighted =  jList1.getSelectedIndices();
+        if (highlighted.length > 0){
+            String recipients = "";
+            for (int x : highlighted){
+                   recipients += model.getElementAt(x) + ",";
+            }
+            client.send(recipients.substring(0,recipients.length()-1),jTextField1.getText());
+        }
+        else{
+            client.send("*",jTextField1.getText());
+        }
+        
         jTextField1.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -196,10 +212,10 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
@@ -216,9 +232,11 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
 
     @Override
     public void OnlineCmdArrived(List chatters) {
-        jTextArea2.setText("");
+        model.addElement(client);
+        model.clear();
+        model.addElement("*");
         for (Object chatter : chatters){
-            jTextArea2.setText(jTextArea2.getText() + " " + chatter.toString());
+             model.addElement(chatter);;
         }
     }
 
