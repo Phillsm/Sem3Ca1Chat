@@ -22,17 +22,20 @@ import shared.ProtocolStrings;
  */
 public class ClientHandler extends Thread {
      
+    public enum State {New, Connected, Disconnected};
     private final Socket socket;
     private final Scanner input;
     private final PrintWriter writer;
     private String clientID;
     private final CommandHandler cmd;
+    private State clientstate;
     
    public ClientHandler(Socket socket) throws IOException {
     this.socket = socket;
     this.input = new Scanner(socket.getInputStream());
     this.writer = new PrintWriter(socket.getOutputStream(), true);
     this.cmd = new CommandHandler();
+    this.clientstate = State.New;
 
   }
   
@@ -70,12 +73,27 @@ public class ClientHandler extends Thread {
      }
   }
   private void Connect(Command cmd){
+       if (this.clientstate == State.New){
        this.clientID =  cmd.getConnectName().get();
-       ChatServer.Connect(cmd.getConnectName().get(), this);
+       ChatServer.Connect();
+       this.clientstate = State.Connected;
+       }
+       else{
+           System.out.println("Connect in handler triggered when in wrong state");
+       ChatServer.Close(this);
+       }
   }
+  
+ 
    
   private void Send(Command cmd){
+      if (this.clientstate == State.Connected){
       ChatServer.send(cmd, this.clientID);
+      }
+      else{
+          System.out.println("Send in handler triggered when in wrong state");
+      ChatServer.Close(this);
+      }
   }
   public void sendCommand(String msg){
       writer.println(msg);

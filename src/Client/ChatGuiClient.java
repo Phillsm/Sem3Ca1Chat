@@ -236,7 +236,7 @@ public class ChatGuiClient extends javax.swing.JFrame implements ChatListener{
         model.clear();
         model.addElement("*");
         for (Object chatter : chatters){
-             model.addElement(chatter);;
+             model.addElement(chatter);
         }
     }
 

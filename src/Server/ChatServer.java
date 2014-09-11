@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -64,10 +65,12 @@ public class ChatServer {
     
     int webport = 8080;
     String webip = "127.0.0.1";
-    
+    //String webip = "178.62.15.16";
+
     
     HttpServer server = HttpServer.create(new InetSocketAddress(webip,webport),0);
     server.createContext("/pages/", new PagesHandler());
+    server.createContext("/online/", new OnlineHandler());
     server.setExecutor(null);
     server.start();
     System.out.println("server started, listening on port: " + webport);
@@ -97,7 +100,7 @@ public class ChatServer {
     }
   }
 
-   public static void Connect(String clientID, ClientHandler client) {
+   public static void Connect() {
 
        updateOnline();
        
@@ -111,11 +114,17 @@ public class ChatServer {
   private static void updateOnline(){
       String persons = "";
       for (ClientHandler c : clients){
+          if (c.getClientId() != null){
           persons += c.getClientId() + ",";
+          }
+          else{
+              clients.remove(c);
+          }
       }
       String command = "ONLINE#" + persons.substring(0,persons.length()-1);
       
       clients.stream().forEach(c -> c.sendCommand(command));
+      
   }
   
   
@@ -146,4 +155,32 @@ public class ChatServer {
             
           }
       }
+   private static class OnlineHandler implements HttpHandler{
+
+        @Override
+        public void handle(HttpExchange he) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<!DOCTYPE html>\n");
+            sb.append("<html>");
+            sb.append("<head>");
+            sb.append("</head>");
+            sb.append("<body>");
+            sb.append("<h1> Users online:</h1>");
+            sb.append("<ul>");
+            for (ClientHandler client : clients){
+                sb.append("<li>");
+                sb.append(client.getClientId());
+                sb.append("</li>");
+            }
+            sb.append("</ul>");
+            sb.append("</body>");
+            sb.append("</html>");
+            
+            he.sendResponseHeaders(200, sb.toString().length());
+            try (PrintWriter pw = new PrintWriter(he.getResponseBody())){
+                pw.print(sb.toString());
+            }
+        }
+   
+   }
 }

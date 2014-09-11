@@ -47,8 +47,7 @@ public class Gui extends javax.swing.JFrame implements ChatListener {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -76,48 +75,44 @@ public class Gui extends javax.swing.JFrame implements ChatListener {
         jTextFieldPort.setText("9090");
 
         jTextFieldHost.setText("178.62.15.16");
-        jTextFieldHost.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        jTextFieldHost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldHostActionPerformed(evt);
             }
         });
 
         jButtonConnect.setText("Connect");
-        jButtonConnect.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        jButtonConnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonConnectActionPerformed(evt);
             }
         });
 
         jButtonSend.setText("Send");
-        jButtonSend.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        jButtonSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSendActionPerformed(evt);
             }
         });
 
         jButtonClose.setText("Close");
-        jButtonClose.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        jButtonClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCloseActionPerformed(evt);
             }
         });
 
         jLabel3.setText("Message:");
 
+        jTextFieldMessage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldMessageActionPerformed(evt);
+            }
+        });
+
         jButtonClear.setText("Clear chat");
-        jButtonClear.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        jButtonClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonClearActionPerformed(evt);
             }
         });
@@ -126,8 +121,7 @@ public class Gui extends javax.swing.JFrame implements ChatListener {
         jTextAreaChat.setRows(5);
         jScrollPane1.setViewportView(jTextAreaChat);
 
-        jListUsers.setModel(new javax.swing.AbstractListModel()
-        {
+        jListUsers.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
@@ -221,7 +215,7 @@ public class Gui extends javax.swing.JFrame implements ChatListener {
     try
         {
             client.connect(jTextFieldHost.getText(), Integer.parseInt(jTextFieldPort.getText()), jTextFieldName.getText());
-        } catch (IOException ex)
+        } catch (Exception ex)
         {
         }     
     }//GEN-LAST:event_jButtonConnectActionPerformed
@@ -253,6 +247,10 @@ public class Gui extends javax.swing.JFrame implements ChatListener {
     private void jButtonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonClearActionPerformed
       jTextAreaChat.setText("");
     }//GEN-LAST:event_jButtonClearActionPerformed
+
+    private void jTextFieldMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldMessageActionPerformed
+        jButtonSendActionPerformed(evt);
+    }//GEN-LAST:event_jTextFieldMessageActionPerformed
 
     /**
      * @param args the command line arguments

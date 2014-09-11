@@ -49,15 +49,16 @@ public class ChatClient extends Thread{
 
  
   
-  public void connect(String address, int port, String client) throws UnknownHostException, IOException
+  public void connect(String address, int port, String client) throws UnknownHostException, IOException, InterruptedException
   {
     this.port = port;
     serverAddress = InetAddress.getByName(address);
     socket = new Socket(serverAddress, port);
     input = new Scanner(socket.getInputStream());
     output = new PrintWriter(socket.getOutputStream(), true);//Set to true, to get auto flush behaviour
-    output.println("CONNECT#"+client);
     this.start();
+    Thread.sleep(1000);
+    output.println("CONNECT#"+client);
   }
   
   public void send(String recipients, String msg)
