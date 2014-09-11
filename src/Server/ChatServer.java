@@ -6,7 +6,14 @@
 
 package Server;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -53,7 +60,19 @@ public class ChatServer {
   }
 
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
+    
+    int webport = 8080;
+    String webip = "127.0.0.1";
+    
+    
+    HttpServer server = HttpServer.create(new InetSocketAddress(webip,webport),0);
+    server.createContext("/pages/", new PagesHandler());
+    server.setExecutor(null);
+    server.start();
+    System.out.println("server started, listening on port: " + webport);
+        
+        
     clients = new ArrayList();
     int port = Integer.parseInt(properties.getProperty("port"));
     String ip = properties.getProperty("serverIp");
@@ -98,5 +117,33 @@ public class ChatServer {
       
       clients.stream().forEach(c -> c.sendCommand(command));
   }
-    
+  
+  
+   private static class PagesHandler implements HttpHandler
+      {
+        String contentFolder ="contentFolder/";
+        @Override
+        public void handle(HttpExchange he) throws IOException
+          {
+            String[] splitted = he.getRequestURI().toString().split("/");
+            String filename = splitted[2]; 
+            File file = new File(contentFolder + filename);
+            byte[] bytesToSend = new byte[(int) file.length()];
+            try 
+              {
+                  BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+                  bis.read(bytesToSend,0,bytesToSend.length);    
+              }
+            catch (IOException ie)
+              {
+                ie.printStackTrace();
+              }
+            he.sendResponseHeaders(200, bytesToSend.length);
+             try (OutputStream os = he.getResponseBody())
+               {
+                 os.write(bytesToSend,0,bytesToSend.length);
+               }
+            
+          }
+      }
 }
