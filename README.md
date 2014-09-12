@@ -13,7 +13,7 @@ Opgave Fordeling
 ----------------
 * Markus: Gui client
 * Charles: http Server, html content
-* Phillip: Phillip: implementation af stringprotocol
+* Phillip: implementation af stringprotocol
 
 Wireshark example
 -----------------
